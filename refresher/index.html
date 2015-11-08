@@ -5,6 +5,9 @@
         <title>D3 Page Template</title>
         <script src="../d3.js" charset="utf-8"></script>
         <style media="screen">
+            svg text {
+                pointer-events: none;
+            }
             .axis path,
             .axis line {
                 fill: none;
@@ -20,7 +23,8 @@
         </style>
     </head>
     <body>
-        <p>Click on this text to update the chart with new data values.</p>
+        <p id="add">Add a new data value</p>
+        <p id="remove">Remove a data value</p>
         <script src="barchart.js" charset="utf-8"></script>
         <br>
         <!-- <script src="scatterplot.js" charset="utf-8"></script> -->

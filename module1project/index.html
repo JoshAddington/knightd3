@@ -20,14 +20,65 @@
 		<h2>Traffic Fatalities in North Carolina, 2012</h2>
 	</body>
 	<script type="text/javascript">
-		var dataset = [{'January': 73}, {'February': 86}, {'March': 97},
-		 			   {'April', 85}, {'May': 109}, {'June': 118},
-					   {'July': 125}, {'August': 120}, {'September': 128},
-					   {'October': 116},{'November': 110}, {'December': 95}];
+		var dataset = [{month: 'January', fatalities: 73}, {month: 'February', fatalities: 86}, {month: 'March', fatalities: 97},
+		 	{month: 'April', fatalities: 85}, {month: 'May', fatalities: 109}, {month: 'June', fatalities: 118},
+		 	{month: 'July', fatalities: 125}, {month: 'August', fatalities: 120}, {month: 'September', fatalities: 128},
+			{month: 'October', fatalities: 116},{month: 'November', fatalities: 110}, {month: 'December', fatalities: 95}];
 
 		var w = 500;
 		var h = 700;
+		var padding = [ 50, 20, 30, 50];
+
+
+		var xScale = d3.scale.ordinal()
+			// .domain(d3.range(dataset.length))
+			.domain(dataset.map(function(d){ console.log(d); return d.month; }))
+			.rangeRoundBands([0, w - padding[1] - padding[3] ], 0.1);
+
+		var yScale = d3.scale.linear()
+			.range([ 0, h - padding[0] - padding[2] ])
+			.domain([0, d3.max(dataset, function(d){ return d.fatalities; })]);
+
+
+		var xAxis = d3.svg.axis()
+			.scale(xScale)
+			.orient('bottom');
+
+		var yAxis = d3.svg.axis()
+			.scale(yScale)
+			.orient('left');
+
 		var svg = d3.select('body')
-					 .append('svg')
+			.append('svg')
+			.attr({
+				width: w,
+				height: h
+			});
+
+		var rects = svg.selectAll('rect')
+			.data(dataset)
+			.enter()
+			.append('rect');
+
+		rects.attr({
+				x: function(d){ return xScale(d.month) + padding[3]; },
+				y:  function(d){ return h - yScale(d.fatalities) - padding[2]; },
+				width: xScale.rangeBand(),
+				height: 0,
+				fill: 'steelblue'
+		 	})
+			.append('title')
+			.text(function(d){
+				return d.month + "'s traffic fatalities.";
+			});
+
+		rects.transition()
+			.duration(500)
+			.attr({
+				height: function(d){
+					return yScale(d.fatalities);
+				}
+			});
+
 	</script>
 </html>

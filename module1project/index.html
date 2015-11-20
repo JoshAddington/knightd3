@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="utf-8">
-		<title>Yelp scores of coffee shops in Durham, NC</title>
+		<title>Traffic Fatalities in North Carolina, 2012</title>
 		<script src="../d3.js" charset="utf-8"></script>
 		<style media="screen">
 			body {
@@ -13,6 +13,13 @@
 			svg	{
 				background-color: white;
 				box-shadow: 3px 3px 5px #ccc;
+			}
+
+			g.bar text {
+				font-size: 11px;
+				font-family: sans-serif;
+				font-weight: bold;
+				text-anchor: middle;
 			}
 		</style>
 	</head>
@@ -26,18 +33,18 @@
 			{month: 'October', fatalities: 116},{month: 'November', fatalities: 110}, {month: 'December', fatalities: 95}];
 
 		var w = 500;
-		var h = 700;
+		var h = 600;
 		var padding = [ 50, 20, 30, 50];
 
 
 		var xScale = d3.scale.ordinal()
 			// .domain(d3.range(dataset.length))
-			.domain(dataset.map(function(d){ console.log(d); return d.month; }))
+			.domain(dataset.map(function(d){ return d.month; }))
 			.rangeRoundBands([padding[3], w - padding[1] ], 0.1);
 
 		var yScale = d3.scale.linear()
-			.domain([0, d3.max(dataset, function(d){ return d.fatalities; })])
-			.range([0 , h - padding[0] - padding[2] ]);
+			.domain([d3.max(dataset, function(d){ return d.fatalities; }), 0])
+			.range([0, h - padding[0] - padding[2]]);
 
 
 		var xAxis = d3.svg.axis()
@@ -55,30 +62,56 @@
 				height: h
 			});
 
-		var rects = svg.selectAll('rect')
+		var groups = svg.selectAll("g")
 			.data(dataset)
 			.enter()
-			.append('rect');
+			.append("g")
+			.attr("class", "bar");
 
-		rects.attr({
+
+		var bars = groups.append('rect')
+			.attr({
 				x: function(d){ return xScale(d.month); },
-				y:  function(d){ return  h - padding[2] - yScale(d.fatalities); },
+				y:  h - padding[2],
 				width: xScale.rangeBand(),
 				height: 0,
 				fill: 'steelblue'
-		 	})
-			.append('title')
-			.text(function(d){
-				return d.month + "'s traffic fatalities.";
+		 	});
+
+		var text = groups.append('text')
+			.text(function(d){ return d.fatalities; })
+			.attr({
+				x: function(d){ return xScale(d.month) + xScale.rangeBand()/2; },
+				y: h - padding[2],
 			});
 
-		rects.transition()
+		bars.transition()
 			.duration(500)
 			.attr({
-				height: function(d){
-					return yScale(d.fatalities);
-				}
+				y: function(d){ return h -  padding[2] - yScale(d.fatalities); },
+				height: function(d){ return yScale(d.fatalities); }
 			});
+
+		text.transition()
+			.duration(500)
+			.attr({
+				x: function(d){ return xScale(d.month) + xScale.rangeBand()/2; },
+				y: function(d){ return h - padding[2] - yScale(d.fatalities) + 15; },
+			});
+
+		svg.append('g')
+			.attr({
+				class: 'x axis',
+				transform: 'translate( ' + padding[3] + ', ' + (h - padding[2]) + ')',
+			})
+			.call(xAxis);
+
+		svg.append('g')
+			.attr({
+				class: 'y axis',
+				transform: 'translate( ' + padding[0] + ', ' + padding[3] + ')',
+			})
+			.call(yAxis);
 
 	</script>
 </html>

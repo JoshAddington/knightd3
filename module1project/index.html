@@ -19,7 +19,7 @@
 				font-size: 11px;
 				font-family: sans-serif;
 				font-weight: bold;
-				text-anchor: middle;
+				text-anchor: end;
 			}
 		</style>
 	</head>
@@ -37,14 +37,13 @@
 		var padding = [ 50, 20, 30, 50];
 
 
-		var xScale = d3.scale.ordinal()
-			// .domain(d3.range(dataset.length))
+		var yScale = d3.scale.ordinal()
 			.domain(dataset.map(function(d){ return d.month; }))
-			.rangeRoundBands([padding[3], w - padding[1] ], 0.1);
+			.rangeRoundBands([padding[0], h - padding[2] ], 0.1);
 
-		var yScale = d3.scale.linear()
-			.domain([d3.max(dataset, function(d){ return d.fatalities; }), 0])
-			.range([0, h - padding[0] - padding[2]]);
+		var xScale = d3.scale.linear()
+			.domain([0, d3.max(dataset, function(d){ return d.fatalities; })])
+			.range([0, w - padding[1] - padding[3]]);
 
 
 		var xAxis = d3.svg.axis()
@@ -71,45 +70,43 @@
 
 		var bars = groups.append('rect')
 			.attr({
-				x: function(d){ return xScale(d.month); },
-				y:  h - padding[2],
-				width: xScale.rangeBand(),
-				height: 0,
+				x: padding[3],
+				y:  function(d){ return yScale(d.month); },
+				width: 0,
+				height: yScale.rangeBand(),
 				fill: 'steelblue'
 		 	});
 
 		var text = groups.append('text')
 			.text(function(d){ return d.fatalities; })
 			.attr({
-				x: function(d){ return xScale(d.month) + xScale.rangeBand()/2; },
-				y: h - padding[2],
+				x: 0,
+				y: function(d){ return yScale(d.month) + yScale.rangeBand()/2; },
 			});
 
 		bars.transition()
 			.duration(500)
 			.attr({
-				y: function(d){ return h -  padding[2] - yScale(d.fatalities); },
-				height: function(d){ return yScale(d.fatalities); }
+				width: function(d){ return xScale(d.fatalities); },
 			});
 
 		text.transition()
 			.duration(500)
 			.attr({
-				x: function(d){ return xScale(d.month) + xScale.rangeBand()/2; },
-				y: function(d){ return h - padding[2] - yScale(d.fatalities) + 15; },
+				x: function(d){ return xScale(d.fatalities) + padding[3] - 10;},
 			});
 
 		svg.append('g')
 			.attr({
 				class: 'x axis',
-				transform: 'translate( ' + padding[3] + ', ' + (h - padding[2]) + ')',
+				transform: 'translate(' + padding[3] + ', ' + (h - padding[2]) + ')',
 			})
 			.call(xAxis);
 
 		svg.append('g')
 			.attr({
 				class: 'y axis',
-				transform: 'translate( ' + padding[0] + ', ' + padding[3] + ')',
+				transform: 'translate( ' + padding[3] + ', 0)',
 			})
 			.call(yAxis);
 

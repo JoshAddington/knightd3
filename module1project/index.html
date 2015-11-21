@@ -32,9 +32,9 @@
 		 	{month: 'July', fatalities: 125}, {month: 'August', fatalities: 120}, {month: 'September', fatalities: 128},
 			{month: 'October', fatalities: 116},{month: 'November', fatalities: 110}, {month: 'December', fatalities: 95}];
 
-		var w = 500;
+		var w = 600;
 		var h = 600;
-		var padding = [ 50, 20, 30, 50];
+		var padding = [ 50, 50, 50, 100];
 
 
 		var yScale = d3.scale.ordinal()
@@ -85,12 +85,14 @@
 			});
 
 		bars.transition()
+			.delay( function(d, i){ return i * 25; })
 			.duration(500)
 			.attr({
 				width: function(d){ return xScale(d.fatalities); },
 			});
 
 		text.transition()
+			.delay( function(d, i){ return i * 25; })
 			.duration(500)
 			.attr({
 				x: function(d){ return xScale(d.fatalities) + padding[3] - 10;},
